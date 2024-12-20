@@ -15,7 +15,7 @@ func NewDatabaseConnection() *DatabaseConnection {
 
 func (dbConn *DatabaseConnection) GetDatabaseConnection() *gorm.DB {
 	if dbConn.databaseInstance == nil {
-		sqlDialect := mysql.Open("root:@tcp(127.0.0.1:3306)/go-asteline-api?charset=utf8mb4&parseTime=True&loc=Local")
+		sqlDialect := mysql.Open("root:root@tcp(127.0.0.1:3306)/go_asteline_api?charset=utf8mb4&parseTime=True&loc=Local")
 		gormOpen, err := gorm.Open(sqlDialect, &gorm.Config{})
 		dbConn.databaseInstance = gormOpen
 		if err != nil {
