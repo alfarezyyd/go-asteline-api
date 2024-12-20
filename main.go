@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-asteline-api/config"
 	"go-asteline-api/routes"
 )
 
@@ -9,13 +10,15 @@ import (
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
 
 func main() {
+	// Initialize
 	ginEngine := gin.Default()
-	ginEngine.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	routes.User(ginEngine)
+	// Database
+	databaseInstance := config.NewDatabaseConnection()
+	databaseConnection := databaseInstance.GetDatabaseConnection()
+
+	// Routes
+	ginEngine.Group("/api")
+	routes.UserRoute(ginEngine, databaseConnection)
 	err := ginEngine.Run()
 	if err != nil {
 		return
