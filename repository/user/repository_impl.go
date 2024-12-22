@@ -2,6 +2,6 @@ package user
 
 type RepositoryImpl struct{}
 
-func NewUserRepositoryImpl() *RepositoryImpl {
+func NewRepository() *RepositoryImpl {
 	return &RepositoryImpl{}
 }

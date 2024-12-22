@@ -2,3 +2,7 @@
 // +build wireinject
 
 package main
+
+func InitializeHandler() {
+
+}

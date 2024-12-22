@@ -1,10 +1,11 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"go-asteline-api/controller/user"
+)
 
-func User(route *gin.Engine) {
-	userRoutes := route.Group("/api/user")
-	userRoutes.POST("", func(c *gin.Context) {
-
-	})
+func UserRoute(route *gin.Engine, userController *user.Handler) {
+	userRoutes := route.Group("/user")
+	userRoutes.POST("/register")
 }
