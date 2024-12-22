@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-asteline-api/controller/user"
+	"go-asteline-api/user"
 )
 
 func UserRoute(route *gin.Engine, userController *user.Handler) {
