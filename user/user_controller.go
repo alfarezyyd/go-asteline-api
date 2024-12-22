@@ -2,6 +2,6 @@ package user
 
 import "github.com/gin-gonic/gin"
 
-type Interface interface {
+type Controller interface {
 	Register(ginContext *gin.Context)
 }

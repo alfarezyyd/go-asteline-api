@@ -5,7 +5,7 @@ import (
 	"go-asteline-api/user"
 )
 
-func UserRoute(route *gin.Engine, userController *user.Handler) {
-	userRoutes := route.Group("/user")
-	userRoutes.POST("/register")
+func UserRoute(route *gin.Engine, userController user.Controller) {
+	route.Group("/user")
+	route.POST("/register", userController.Register)
 }

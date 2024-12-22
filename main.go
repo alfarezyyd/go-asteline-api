@@ -23,7 +23,7 @@ func main() {
 	// Injection of User
 	userRepository := user.NewRepository()
 	userService := user.NewService(userRepository, databaseConnection)
-	userController := user.NewHandler()
+	userController := user.NewHandler(&userService)
 	routes.UserRoute(ginEngine, userController)
 
 	err := ginEngine.Run()

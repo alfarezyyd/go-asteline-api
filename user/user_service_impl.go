@@ -9,7 +9,7 @@ type ServiceImpl struct {
 	dbConnection   *gorm.DB
 }
 
-func NewService(userRepository Repository, dbConnection *gorm.DB) *ServiceImpl {
+func NewService(userRepository Repository, dbConnection *gorm.DB) Service {
 	return &ServiceImpl{
 		UserRepository: userRepository,
 		dbConnection:   dbConnection,
