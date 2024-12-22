@@ -1,17 +1,15 @@
 package user
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type ServiceImpl struct {
-	UserRepository Repository
+	userRepository Repository
 	dbConnection   *gorm.DB
 }
 
-func NewService(userRepository Repository, dbConnection *gorm.DB) Service {
+func NewService(userRepository Repository, dbConnection *gorm.DB) *ServiceImpl {
 	return &ServiceImpl{
-		UserRepository: userRepository,
+		userRepository: userRepository,
 		dbConnection:   dbConnection,
 	}
 }

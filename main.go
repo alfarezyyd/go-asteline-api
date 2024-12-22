@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-asteline-api/config"
 	"go-asteline-api/routes"
-	"go-asteline-api/user"
 )
 
 //TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
@@ -21,9 +20,7 @@ func main() {
 	ginEngine.Group("/api")
 
 	// Injection of User
-	userRepository := user.NewRepository()
-	userService := user.NewService(userRepository, databaseConnection)
-	userController := user.NewHandler(&userService)
+	userController := InitializeUserController(databaseConnection)
 	routes.UserRoute(ginEngine, userController)
 
 	err := ginEngine.Run()

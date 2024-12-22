@@ -3,11 +3,13 @@ package user
 import "github.com/gin-gonic/gin"
 
 type Handler struct {
-	UserService *Service
+	UserService Service
 }
 
-func NewHandler(userService *Service) Controller {
-	return &Handler{}
+func NewHandler(userService Service) *Handler {
+	return &Handler{
+		UserService: userService,
+	}
 }
 
 func (h *Handler) Register(ginContext *gin.Context) {
