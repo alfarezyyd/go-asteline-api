@@ -2,9 +2,10 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-asteline-api/user"
+	"go-asteline-api/campaign"
 )
 
-func UserRoute(routerGroup *gin.RouterGroup, userController user.Controller) {
-
+func UserRoute(routerGroup *gin.RouterGroup, campaignController campaign.Controller) {
+	campaignGroup := routerGroup.Group("/campaigns")
+	campaignGroup.POST("", campaignController.Create)
 }

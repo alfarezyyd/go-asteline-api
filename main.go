@@ -32,10 +32,11 @@ func main() {
 	ginEngine.Use(exception.Interceptor())
 	// Injection of User
 	userController := InitializeUserController(databaseConnection, validatorInstance, viperConfig)
+	campaignController := InitializeCampaignController(databaseConnection, validatorInstance)
 	routes.PublicRoute(ginEngine, userController)
 	apiRouterGroup := ginEngine.Group("/api")
 	apiRouterGroup.Use(middleware.AuthMiddleware(viperConfig))
-	routes.UserRoute(apiRouterGroup, userController)
+	routes.UserRoute(apiRouterGroup, campaignController)
 	err := ginEngine.Run()
 	if err != nil {
 		return
