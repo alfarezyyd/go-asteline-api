@@ -1,4 +1,4 @@
-CREATE TABLE `campaign`
+CREATE TABLE `campaigns`
 (
     `id`             BIGINT UNSIGNED                           NOT NULL AUTO_INCREMENT PRIMARY KEY, -- ID unik kampanye
     `title`          VARCHAR(255)                              NOT NULL,                            -- Judul kampanye
