@@ -9,6 +9,7 @@ package main
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
+	"github.com/spf13/viper"
 	"go-asteline-api/config"
 	"go-asteline-api/user"
 	"gorm.io/gorm"
@@ -16,9 +17,9 @@ import (
 
 // Injectors from injector.go:
 
-func InitializeUserController(gormConnection *gorm.DB, validatorInstance *validator.Validate) user.Controller {
+func InitializeUserController(gormConnection *gorm.DB, validatorInstance *validator.Validate, viperConfig *viper.Viper) user.Controller {
 	repositoryImpl := user.NewRepository()
-	serviceImpl := user.NewService(repositoryImpl, gormConnection, validatorInstance)
+	serviceImpl := user.NewService(repositoryImpl, gormConnection, validatorInstance, viperConfig)
 	handler := user.NewHandler(serviceImpl)
 	return handler
 }
