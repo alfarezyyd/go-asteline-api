@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"go-asteline-api/config"
 	"go-asteline-api/exception"
+	"go-asteline-api/middleware"
 	"go-asteline-api/routes"
 )
 
@@ -25,15 +26,16 @@ func main() {
 	validatorInstance := config.InitializeValidator()
 
 	// Routes
-	ginEngine.Group("/api")
 
 	// Interceptor
 	ginEngine.Use(gin.Recovery())
 	ginEngine.Use(exception.Interceptor())
 	// Injection of User
 	userController := InitializeUserController(databaseConnection, validatorInstance, viperConfig)
-	routes.UserRoute(ginEngine, userController)
-
+	routes.PublicRoute(ginEngine, userController)
+	apiRouterGroup := ginEngine.Group("/api")
+	apiRouterGroup.Use(middleware.AuthMiddleware(viperConfig))
+	routes.UserRoute(apiRouterGroup, userController)
 	err := ginEngine.Run()
 	if err != nil {
 		return
