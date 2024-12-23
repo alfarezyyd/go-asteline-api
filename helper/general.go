@@ -7,7 +7,7 @@ import (
 func CheckErrorOperation(indicatedError error, errorForwarder func()) bool {
 	if indicatedError != nil {
 		errorForwarder()
-		return true
+		panic("Error")
 	}
 	return false
 }
