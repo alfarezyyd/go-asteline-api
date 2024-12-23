@@ -1,6 +1,9 @@
 package user
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"go-asteline-api/user/dto"
+)
 
 type Handler struct {
 	UserService Service
@@ -12,6 +15,13 @@ func NewHandler(userService Service) *Handler {
 	}
 }
 
-func (h *Handler) Register(ginContext *gin.Context) {
+func (userHandler *Handler) Register(ginContext *gin.Context) {
+	var userRegisterDto dto.UserRegisterDto
+	err := ginContext.ShouldBindJSON(&userRegisterDto)
+	userHandler.UserService.HandleSave(ginContext, &userRegisterDto)
 
+	if err != nil {
+		panic(err)
+		return
+	}
 }
