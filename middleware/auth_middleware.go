@@ -5,12 +5,13 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
 	"net/http"
+	"strings"
 )
 
 func AuthMiddleware(viperConfig *viper.Viper) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
-
+		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
 		// Parse the token
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
