@@ -3,6 +3,7 @@ package mapper
 import (
 	"fmt"
 	"github.com/go-viper/mapstructure/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"go-asteline-api/model"
 	"go-asteline-api/user/dto"
 	"time"
@@ -34,4 +35,13 @@ func MapUserRegisterDtoIntoUserModel(userRegisterDto dto.UserRegisterDto) (*mode
 	}
 	fmt.Println(user)
 	return &user, nil
+}
+
+func MapJwtClaimIntoUserClaim(jwtClaim jwt.MapClaims) (*dto.UserClaims, error) {
+	var userClaim dto.UserClaims
+	err := mapstructure.Decode(jwtClaim, &userClaim)
+	if err != nil {
+		return nil, err
+	}
+	return &userClaim, nil
 }
