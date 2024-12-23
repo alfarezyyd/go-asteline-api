@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"go-asteline-api/config"
 	"go-asteline-api/exception"
 	"go-asteline-api/routes"
@@ -17,7 +16,7 @@ func main() {
 	// Database
 	databaseInstance := config.NewDatabaseConnection()
 	databaseConnection := databaseInstance.GetDatabaseConnection()
-	validatorInstance := validator.New()
+	validatorInstance := config.InitializeValidator()
 
 	// Routes
 	ginEngine.Group("/api")
