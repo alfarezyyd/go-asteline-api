@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-asteline-api/helper"
 	"go-asteline-api/user/dto"
