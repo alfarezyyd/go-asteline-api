@@ -6,6 +6,7 @@ import (
 )
 
 func UserRoute(route *gin.Engine, userController user.Controller) {
-	route.Group("/user")
-	route.POST("/register", userController.Register)
+	userRouteGroup := route.Group("/user")
+	userRouteGroup.POST("/register", userController.Register)
+	userRouteGroup.POST("/login", userController.Login)
 }

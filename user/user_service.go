@@ -7,4 +7,5 @@ import (
 
 type Service interface {
 	HandleSave(ginContext *gin.Context, userRegisterDto *dto.UserRegisterDto) bool
+	HandleLogin(ginContext *gin.Context, userLoginDto *dto.UserLoginDto) bool
 }
