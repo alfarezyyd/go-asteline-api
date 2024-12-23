@@ -33,14 +33,14 @@ func NewService(userRepository Repository, dbConnection *gorm.DB, structValidato
 
 func (userService *ServiceImpl) HandleSave(ginContext *gin.Context, userRegisterDto *dto.UserRegisterDto) bool {
 	err := userService.structValidator.Struct(userRegisterDto)
-	helper.CheckErrorOperation(err, func() {
-		ginContext.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	})
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest, err.Error()) {
+		return false
+	}
 	dbTransaction := userService.dbConnection.Begin()
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userRegisterDto.Password), 14)
-	helper.CheckErrorOperation(err, func() {
-		ginContext.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	})
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest, err.Error()) {
+		return false
+	}
 	userRegisterDto.Password = string(hashedPassword)
 	userModel, _ := mapper.MapUserRegisterDtoIntoUserModel(*userRegisterDto)
 	defer dbTransaction.Rollback()
@@ -52,27 +52,27 @@ func (userService *ServiceImpl) HandleSave(ginContext *gin.Context, userRegister
 func (userService *ServiceImpl) HandleLogin(ginContext *gin.Context, userLoginDto *dto.UserLoginDto) bool {
 
 	err := userService.structValidator.Struct(userLoginDto)
-	helper.CheckErrorOperation(err, func() {
-		ginContext.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	})
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest, err.Error()) {
+		return false
+	}
 	dbTransaction := userService.dbConnection.Begin()
 	var searchedUsers model.User
 	searchResult := dbTransaction.Where("email = ?", userLoginDto.Email).First(&searchedUsers)
-	helper.CheckErrorOperation(searchResult.Error, func() {
-		ginContext.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "email or password is incorrect"})
-	})
+	if helper.CheckErrorOperation(searchResult.Error, ginContext, http.StatusBadRequest, searchResult.Error.Error()) {
+		return false
+	}
 	err = bcrypt.CompareHashAndPassword([]byte(searchedUsers.Password), []byte(userLoginDto.Password))
-	helper.CheckErrorOperation(err, func() {
-		ginContext.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "email or password is incorrect"})
-	})
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest, err.Error()) {
+		return false
+	}
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": userLoginDto.Email,
 	})
 	fmt.Println(jwtToken, userService.viperConfig.GetString("JWT_SECRET"))
 	tokenString, err := jwtToken.SignedString([]byte(userService.viperConfig.GetString("JWT_SECRET")))
-	helper.CheckErrorOperation(err, func() {
-		ginContext.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-	})
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest, err.Error()) {
+		return false
+	}
 	fmt.Println(tokenString)
 	ginContext.JSON(200, gin.H{
 		"token": tokenString,

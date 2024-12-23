@@ -31,8 +31,8 @@ func (userHandler *Handler) Register(ginContext *gin.Context) {
 func (userHandler *Handler) Login(ginContext *gin.Context) {
 	var userLoginDto dto.UserLoginDto
 	err := ginContext.ShouldBindJSON(&userLoginDto)
-	helper.CheckErrorOperation(err, func() {
-		ginContext.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	})
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest, err.Error()) {
+		return
+	}
 	userHandler.UserService.HandleLogin(ginContext, &userLoginDto)
 }
