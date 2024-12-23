@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-asteline-api/helper"
 	"go-asteline-api/user/dto"
@@ -20,18 +21,16 @@ func NewHandler(userService Service) *Handler {
 func (userHandler *Handler) Register(ginContext *gin.Context) {
 	var userRegisterDto dto.UserRegisterDto
 	err := ginContext.ShouldBindJSON(&userRegisterDto)
-	userHandler.UserService.HandleSave(ginContext, &userRegisterDto)
-
-	if err != nil {
-		panic(err)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
+	userHandler.UserService.HandleSave(ginContext, &userRegisterDto)
 }
 
 func (userHandler *Handler) Login(ginContext *gin.Context) {
 	var userLoginDto dto.UserLoginDto
 	err := ginContext.ShouldBindJSON(&userLoginDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest, err.Error()) {
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
 	userHandler.UserService.HandleLogin(ginContext, &userLoginDto)
