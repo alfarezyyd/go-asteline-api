@@ -12,5 +12,6 @@ CREATE TABLE `campaign`
     `user_id`        BIGINT UNSIGNED                           NOT NULL,                            -- Kunci asing untuk pengguna yang membuat kampanye
     `created_at`     TIMESTAMP                                 NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- Tanggal kampanye dibuat
     `updated_at`     TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                                         -- Tanggal terakhir kampanye diperbarui
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)                                          -- Hubungan dengan tabel `user`
+    CONSTRAINT fk_campaign_users FOREIGN KEY (user_id) REFERENCES users (id)
+
 );
