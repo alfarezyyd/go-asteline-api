@@ -7,6 +7,7 @@
 package main
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
 	"go-asteline-api/config"
 	"go-asteline-api/user"
@@ -15,9 +16,9 @@ import (
 
 // Injectors from injector.go:
 
-func InitializeUserController(gormConnection *gorm.DB) user.Controller {
+func InitializeUserController(gormConnection *gorm.DB, validatorInstance *validator.Validate) user.Controller {
 	repositoryImpl := user.NewRepository()
-	serviceImpl := user.NewService(repositoryImpl, gormConnection)
+	serviceImpl := user.NewService(repositoryImpl, gormConnection, validatorInstance)
 	handler := user.NewHandler(serviceImpl)
 	return handler
 }
