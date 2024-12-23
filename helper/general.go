@@ -5,9 +5,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func CheckErrorOperation(indicatedError error, ginContext *gin.Context, httpStatus int, errorResponse any) bool {
+func CheckErrorOperation(indicatedError error, ginContext *gin.Context, httpStatus int) bool {
 	if indicatedError != nil {
-		ginContext.AbortWithStatusJSON(httpStatus, gin.H{"error": errorResponse})
+		ginContext.AbortWithStatusJSON(httpStatus, gin.H{"error": indicatedError.Error()})
 		return true
 	}
 	return false
