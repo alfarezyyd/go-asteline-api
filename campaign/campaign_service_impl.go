@@ -1,9 +1,16 @@
 package campaign
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v5"
+	"go-asteline-api/campaign/dto"
+	"go-asteline-api/helper"
+	"go-asteline-api/mapper"
+	"go-asteline-api/model"
 	"gorm.io/gorm"
+	"net/http"
 )
 
 type ServiceImpl struct {
@@ -20,6 +27,35 @@ func NewService(dbConnection *gorm.DB, campaignRepository Repository, structVali
 	}
 }
 
-func (serviceImpl *ServiceImpl) HandleCreate(ginContext *gin.Context) {
+func (serviceImpl *ServiceImpl) HandleCreate(ginContext *gin.Context, campaignCreateDto *dto.CampaignCreateDto) {
+	err := serviceImpl.structValidator.Struct(campaignCreateDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	campaignModel, err := mapper.MapCampaignCreateDtoIntoCampaignModel(campaignCreateDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	userClaims, isExists := ginContext.Get("claims")
+	if !isExists {
+		ginContext.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"message": "User not found",
+		})
+		return
+	}
+	claimsMap, _ := userClaims.(jwt.MapClaims)
+	parsedClaimsMap, _ := mapper.MapJwtClaimIntoUserClaim(claimsMap)
+	gormTransaction := serviceImpl.dbConnection.Begin()
+	var userModel model.User
+	dbConn := gormTransaction.Where("email = ?", parsedClaimsMap.Email).First(&userModel)
+	fmt.Println(userModel)
+	if helper.CheckErrorOperation(dbConn.Error, ginContext, http.StatusBadRequest) {
+		return
+	}
+	campaignModel.UserId = userModel.ID
+	dbConn = gormTransaction.Create(&campaignModel)
+	if helper.CheckErrorOperation(dbConn.Error, ginContext, http.StatusBadRequest) {
+		return
+	}
 
 }
