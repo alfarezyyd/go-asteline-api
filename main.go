@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"go-asteline-api/config"
 	"go-asteline-api/exception"
 	"go-asteline-api/routes"
@@ -11,6 +12,11 @@ import (
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
 
 func main() {
+	viperConfig := viper.New()
+	viperConfig.SetConfigFile(".env")
+	viperConfig.AddConfigPath(".")
+	viperConfig.AutomaticEnv()
+	viperConfig.ReadInConfig()
 	// Initialize
 	ginEngine := gin.Default()
 	// Database
@@ -25,7 +31,7 @@ func main() {
 	ginEngine.Use(gin.Recovery())
 	ginEngine.Use(exception.Interceptor())
 	// Injection of User
-	userController := InitializeUserController(databaseConnection, validatorInstance)
+	userController := InitializeUserController(databaseConnection, validatorInstance, viperConfig)
 	routes.UserRoute(ginEngine, userController)
 
 	err := ginEngine.Run()
