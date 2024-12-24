@@ -10,6 +10,7 @@ import (
 	"go-asteline-api/mapper"
 	"go-asteline-api/model"
 	"gorm.io/gorm"
+	"mime/multipart"
 	"net/http"
 )
 
@@ -27,7 +28,7 @@ func NewService(dbConnection *gorm.DB, campaignRepository Repository, structVali
 	}
 }
 
-func (serviceImpl *ServiceImpl) HandleCreate(ginContext *gin.Context, campaignCreateDto *dto.CampaignCreateDto) {
+func (serviceImpl *ServiceImpl) HandleCreate(ginContext *gin.Context, campaignCreateDto *dto.CampaignCreateDto, multipartFile *multipart.FileHeader) {
 	err := serviceImpl.structValidator.Struct(campaignCreateDto)
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
@@ -57,5 +58,10 @@ func (serviceImpl *ServiceImpl) HandleCreate(ginContext *gin.Context, campaignCr
 	if helper.CheckErrorOperation(dbConn.Error, ginContext, http.StatusBadRequest) {
 		return
 	}
-
+	err = ginContext.SaveUploadedFile(multipartFile, fmt.Sprintf("public/assets/%d/%s", campaignModel.ID, multipartFile.Filename))
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	helper.TransactionOperation(gormTransaction)
+	ginContext.JSON(http.StatusCreated, campaignModel)
 }
