@@ -62,6 +62,31 @@ func (serviceImpl *ServiceImpl) HandleCreate(ginContext *gin.Context, campaignCr
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
-	helper.TransactionOperation(gormTransaction)
+	helper.TransactionOperation(gormTransaction, ginContext)
 	ginContext.JSON(http.StatusCreated, campaignModel)
+}
+
+func (serviceImpl *ServiceImpl) HandleUpdate(ginContext *gin.Context, campaignUpdateDto *dto.CampaignUpdateDto, multipartFile *multipart.FileHeader) {
+	err := serviceImpl.structValidator.Struct(campaignUpdateDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	campaignModel, err := mapper.MapCampaignCreateDtoIntoCampaignModel(campaignUpdateDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	userClaims, _ := ginContext.Get("claims")
+	claimsMap, _ := userClaims.(jwt.MapClaims)
+	parsedClaimsMap, _ := mapper.MapJwtClaimIntoUserClaim(claimsMap)
+	gormTransaction := serviceImpl.dbConnection.Begin()
+	var userModel model.User
+	var existingCampaignModel model.Campaign
+	gormTransaction.Where("email = ?", parsedClaimsMap.Email).First(&userModel)
+	existingCampaignModel = *campaignModel
+	gormTransaction.Model(&existingCampaignModel).Where("id = ? AND user_id = ?", ginContext.Param("id"), userModel.ID).Updates(campaignModel)
+	helper.TransactionOperation(gormTransaction, ginContext)
+	fmt.Println(gormTransaction.Debug())
+	ginContext.JSON(http.StatusOK, map[string]interface{}{
+		"message": "Success",
+	})
 }

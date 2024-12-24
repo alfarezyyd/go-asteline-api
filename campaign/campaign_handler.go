@@ -26,3 +26,14 @@ func (campaignHandler *Handler) Create(ginContext *gin.Context) {
 	}
 	campaignHandler.CampaignService.HandleCreate(ginContext, &campaignCreateDto, imageFile)
 }
+
+func (campaignHandler *Handler) Update(ginContext *gin.Context) {
+	var campaignUpdateDto dto.CampaignUpdateDto
+	err := ginContext.Bind(&campaignUpdateDto)
+	imageFile, _ := ginContext.FormFile("image")
+	fmt.Println(campaignUpdateDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	campaignHandler.CampaignService.HandleUpdate(ginContext, &campaignUpdateDto, imageFile)
+}

@@ -46,7 +46,7 @@ func (userService *ServiceImpl) HandleSave(ginContext *gin.Context, userRegister
 	userModel, _ := mapper.MapUserRegisterDtoIntoUserModel(*userRegisterDto)
 	defer dbTransaction.Rollback()
 	dbTransaction.Create(userModel)
-	helper.TransactionOperation(dbTransaction)
+	helper.TransactionOperation(dbTransaction, ginContext)
 	return true
 }
 

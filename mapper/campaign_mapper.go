@@ -6,9 +6,9 @@ import (
 	"go-asteline-api/model"
 )
 
-func MapCampaignCreateDtoIntoCampaignModel(campaignCreateDto *dto.CampaignCreateDto) (*model.Campaign, error) {
+func MapCampaignCreateDtoIntoCampaignModel[T *dto.CampaignCreateDto | *dto.CampaignUpdateDto](campaignSaveDto T) (*model.Campaign, error) {
 	var modelCampaign model.Campaign
-	err := mapstructure.Decode(campaignCreateDto, &modelCampaign)
+	err := mapstructure.Decode(campaignSaveDto, &modelCampaign)
 	if err != nil {
 		return nil, err
 	}
