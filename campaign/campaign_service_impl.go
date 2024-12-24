@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm"
 	"mime/multipart"
 	"net/http"
+	"os"
 )
 
 type ServiceImpl struct {
@@ -49,12 +50,9 @@ func (serviceImpl *ServiceImpl) HandleCreate(ginContext *gin.Context, campaignCr
 	gormTransaction := serviceImpl.dbConnection.Begin()
 	var userModel model.User
 	dbConn := gormTransaction.Where("email = ?", parsedClaimsMap.Email).First(&userModel)
-	fmt.Println(userModel)
 	if helper.CheckErrorOperation(dbConn.Error, ginContext, http.StatusBadRequest) {
 		return
 	}
-	campaignModel.UserId = userModel.ID
-	dbConn = gormTransaction.Create(&campaignModel)
 	if helper.CheckErrorOperation(dbConn.Error, ginContext, http.StatusBadRequest) {
 		return
 	}
@@ -62,6 +60,9 @@ func (serviceImpl *ServiceImpl) HandleCreate(ginContext *gin.Context, campaignCr
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
+	campaignModel.UserId = userModel.ID
+	campaignModel.ImageUrl = multipartFile.Filename
+	dbConn = gormTransaction.Create(&campaignModel)
 	helper.TransactionOperation(gormTransaction, ginContext)
 	ginContext.JSON(http.StatusCreated, campaignModel)
 }
@@ -79,13 +80,23 @@ func (serviceImpl *ServiceImpl) HandleUpdate(ginContext *gin.Context, campaignUp
 	claimsMap, _ := userClaims.(jwt.MapClaims)
 	parsedClaimsMap, _ := mapper.MapJwtClaimIntoUserClaim(claimsMap)
 	gormTransaction := serviceImpl.dbConnection.Begin()
+
 	var userModel model.User
 	var existingCampaignModel model.Campaign
 	gormTransaction.Where("email = ?", parsedClaimsMap.Email).First(&userModel)
-	existingCampaignModel = *campaignModel
-	gormTransaction.Model(&existingCampaignModel).Where("id = ? AND user_id = ?", ginContext.Param("id"), userModel.ID).Updates(campaignModel)
+
+	if multipartFile != nil {
+		dbConn := gormTransaction.First(&existingCampaignModel, "id = ? AND user_id = ?", ginContext.Param("id"), userModel.ID)
+		if helper.CheckErrorOperation(dbConn.Error, ginContext, http.StatusBadRequest) {
+			return
+		}
+		err = os.Remove(fmt.Sprintf("public/assets/%d/%s", existingCampaignModel.ID, existingCampaignModel.ImageUrl))
+		if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+			return
+		}
+	}
+	gormTransaction.Where("id = ? AND user_id = ?", ginContext.Param("id"), userModel.ID).Updates(campaignModel)
 	helper.TransactionOperation(gormTransaction, ginContext)
-	fmt.Println(gormTransaction.Debug())
 	ginContext.JSON(http.StatusOK, map[string]interface{}{
 		"message": "Success",
 	})

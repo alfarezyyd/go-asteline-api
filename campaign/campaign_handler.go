@@ -19,11 +19,13 @@ func NewHandler(campaignService Service) *Handler {
 func (campaignHandler *Handler) Create(ginContext *gin.Context) {
 	var campaignCreateDto dto.CampaignCreateDto
 	err := ginContext.Bind(&campaignCreateDto)
-	imageFile, _ := ginContext.FormFile("image")
+	imageFile, _ := ginContext.FormFile("imageFile")
 	fmt.Println(campaignCreateDto)
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
+	campaignCreateDto.ImageFile = imageFile
+
 	campaignHandler.CampaignService.HandleCreate(ginContext, &campaignCreateDto, imageFile)
 }
 
@@ -31,7 +33,6 @@ func (campaignHandler *Handler) Update(ginContext *gin.Context) {
 	var campaignUpdateDto dto.CampaignUpdateDto
 	err := ginContext.Bind(&campaignUpdateDto)
 	imageFile, _ := ginContext.FormFile("image")
-	fmt.Println(campaignUpdateDto)
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
