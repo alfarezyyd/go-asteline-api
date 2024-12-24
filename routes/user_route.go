@@ -9,4 +9,5 @@ func UserRoute(routerGroup *gin.RouterGroup, campaignController campaign.Control
 	campaignGroup := routerGroup.Group("/campaigns")
 	campaignGroup.POST("", campaignController.Create)
 	campaignGroup.PUT("/:id", campaignController.Update)
+	campaignGroup.DELETE("/:id", campaignController.Delete)
 }

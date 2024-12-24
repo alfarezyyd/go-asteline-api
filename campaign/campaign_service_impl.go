@@ -101,3 +101,19 @@ func (serviceImpl *ServiceImpl) HandleUpdate(ginContext *gin.Context, campaignUp
 		"message": "Success",
 	})
 }
+
+func (serviceImpl *ServiceImpl) HandleDelete(ginContext *gin.Context) {
+	userClaims, _ := ginContext.Get("claims")
+	claimsMap, _ := userClaims.(jwt.MapClaims)
+	parsedClaimsMap, _ := mapper.MapJwtClaimIntoUserClaim(claimsMap)
+	gormTransaction := serviceImpl.dbConnection.Begin()
+	var userModel model.User
+	var existingCampaignModel model.Campaign
+	gormTransaction.Where("email = ?", parsedClaimsMap.Email).First(&userModel)
+	dbConn := gormTransaction.Where("id = ? AND user_id = ?", ginContext.Param("id"), userModel.ID).First(&existingCampaignModel)
+	if helper.CheckErrorOperation(dbConn.Error, ginContext, http.StatusNotFound) {
+		return
+	}
+	gormTransaction.Delete(&existingCampaignModel)
+	helper.TransactionOperation(gormTransaction, ginContext)
+}

@@ -9,4 +9,5 @@ import (
 type Service interface {
 	HandleCreate(ginContext *gin.Context, campaignCreateDto *dto.CampaignCreateDto, multipartFile *multipart.FileHeader)
 	HandleUpdate(ginContext *gin.Context, campaignUpdateDto *dto.CampaignUpdateDto, multipartFile *multipart.FileHeader)
+	HandleDelete(ginContext *gin.Context)
 }

@@ -38,3 +38,7 @@ func (campaignHandler *Handler) Update(ginContext *gin.Context) {
 	}
 	campaignHandler.CampaignService.HandleUpdate(ginContext, &campaignUpdateDto, imageFile)
 }
+
+func (campaignHandler *Handler) Delete(ginContext *gin.Context) {
+	campaignHandler.CampaignService.HandleDelete(ginContext)
+}
