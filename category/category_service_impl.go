@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go-asteline-api/category/dto"
 	"go-asteline-api/helper"
+	"go-asteline-api/mapper"
 	"gorm.io/gorm"
 	"net/http"
 )
@@ -15,7 +16,7 @@ type ServiceImpl struct {
 	validatorInstance  *validator.Validate
 }
 
-func NewServiceImpl(categoryRepository Repository, dbConnection *gorm.DB, validatorInstance *validator.Validate) *ServiceImpl {
+func NewService(categoryRepository Repository, dbConnection *gorm.DB, validatorInstance *validator.Validate) *ServiceImpl {
 	return &ServiceImpl{
 		categoryRepository: categoryRepository,
 		dbConnection:       dbConnection,
@@ -30,6 +31,12 @@ func (categoryService *ServiceImpl) HandleCreate(ginContext *gin.Context, catego
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
+	categoryModel, err := mapper.MapCategoryDtoIntoCategoryModel(categoryCreateDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	categoryService.dbConnection.Create(categoryModel)
+	ginContext.JSON(http.StatusCreated, categoryModel)
 }
 
 func (categoryService *ServiceImpl) HandleUpdate(ginContext *gin.Context, categoryUpdateDto *dto.CategoryUpdateDto) {
