@@ -29,6 +29,12 @@ func NewService(dbConnection *gorm.DB, campaignRepository Repository, structVali
 	}
 }
 
+func (serviceImpl *ServiceImpl) HandleGetAll(ginContext *gin.Context) []model.Campaign {
+	var allCampaignsModel []model.Campaign
+	serviceImpl.dbConnection.Find(&allCampaignsModel)
+	return allCampaignsModel
+}
+
 func (serviceImpl *ServiceImpl) HandleCreate(ginContext *gin.Context, campaignCreateDto *dto.CampaignCreateDto, multipartFile *multipart.FileHeader) {
 	err := serviceImpl.structValidator.Struct(campaignCreateDto)
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {

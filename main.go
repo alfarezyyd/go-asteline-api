@@ -33,7 +33,7 @@ func main() {
 	// Injection of User
 	userController := InitializeUserController(databaseConnection, validatorInstance, viperConfig)
 	campaignController := InitializeCampaignController(databaseConnection, validatorInstance)
-	routes.PublicRoute(ginEngine, userController)
+	routes.PublicRoute(ginEngine, userController, campaignController)
 	apiRouterGroup := ginEngine.Group("/api")
 	apiRouterGroup.Use(middleware.AuthMiddleware(viperConfig))
 	routes.UserRoute(apiRouterGroup, campaignController)

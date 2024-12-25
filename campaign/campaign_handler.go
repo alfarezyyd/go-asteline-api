@@ -16,6 +16,11 @@ func NewHandler(campaignService Service) *Handler {
 	return &Handler{CampaignService: campaignService}
 }
 
+func (campaignHandler *Handler) GetAll(ginContext *gin.Context) {
+	allCampaignModels := campaignHandler.CampaignService.HandleGetAll(ginContext)
+	ginContext.JSON(http.StatusOK, allCampaignModels)
+}
+
 func (campaignHandler *Handler) Create(ginContext *gin.Context) {
 	var campaignCreateDto dto.CampaignCreateDto
 	err := ginContext.Bind(&campaignCreateDto)
