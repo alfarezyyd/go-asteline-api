@@ -6,6 +6,7 @@ import (
 	"go-asteline-api/category/dto"
 	"go-asteline-api/helper"
 	"go-asteline-api/mapper"
+	"go-asteline-api/model"
 	"gorm.io/gorm"
 	"net/http"
 )
@@ -40,7 +41,37 @@ func (categoryService *ServiceImpl) HandleCreate(ginContext *gin.Context, catego
 }
 
 func (categoryService *ServiceImpl) HandleUpdate(ginContext *gin.Context, categoryUpdateDto *dto.CategoryUpdateDto) {
+	categoryId := ginContext.Param("id")
+	if categoryId == "" {
+		ginContext.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "id is required"})
+		return
+	}
+	err := categoryService.validatorInstance.Struct(categoryUpdateDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	categoryModel, err := mapper.MapCategoryDtoIntoCategoryModel(categoryUpdateDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	gormTransaction := categoryService.dbConnection.Begin()
+	gormTransaction.Where("id = ?", categoryId).First(&categoryModel)
+	gormTransaction.Where("id = ?", categoryId).Updates(categoryModel)
+	helper.TransactionOperation(gormTransaction, ginContext)
+	ginContext.JSON(http.StatusOK, categoryModel)
 }
 
 func (categoryService *ServiceImpl) HandleDelete(ginContext *gin.Context) {
+	categoryId := ginContext.Param("id")
+	if categoryId == "" {
+		ginContext.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "id is required"})
+		return
+	}
+	gormTransaction := categoryService.dbConnection.Begin()
+	dbConn := gormTransaction.Where("id = ?", categoryId).Delete(&model.Category{})
+	if helper.CheckErrorOperation(dbConn.Error, ginContext, http.StatusBadRequest) {
+		return
+	}
+	helper.TransactionOperation(gormTransaction, ginContext)
+	ginContext.JSON(http.StatusOK, gin.H{"message": "ok"})
 }
