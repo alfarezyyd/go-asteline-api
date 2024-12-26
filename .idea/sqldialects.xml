@@ -5,6 +5,8 @@
     <file url="file://$PROJECT_DIR$/migrations/20241220124002_create_table_users.down.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/migrations/20241220124002_create_table_users.up.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/migrations/20241223094206_create_table_campaigns.up.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/migrations/20241226062100_create_table_donations.up.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/migrations/20241226071056_create_table_donation_actions.up.sql" dialect="MySQL" />
     <file url="PROJECT" dialect="MySQL" />
   </component>
 </project>
