@@ -7,7 +7,7 @@ type Campaign struct {
 	Title         string     `gorm:"column:title;"`
 	Description   string     `gorm:"column:description"`
 	GoalAmount    float64    `gorm:"column:goal_amount"`
-	CurrentAmount uint64     `gorm:"column:current_amount"`
+	CurrentAmount float64    `gorm:"column:current_amount"`
 	StartDate     string     `gorm:"column:start_date"`
 	EndDate       string     `gorm:"column:end_date"`
 	ImageUrl      string     `gorm:"column:image_url"`

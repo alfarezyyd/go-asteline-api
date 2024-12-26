@@ -4,7 +4,7 @@ import "time"
 
 type Donation struct {
 	ID                 string    `gorm:"column:id;primary_key" mapstructure:"Id"`
-	UserId             uint64    `gorm:"column:user_id"`
+	UserId             *uint64   `gorm:"column:user_id"`
 	CampaignId         uint64    `gorm:"column:campaign_id" mapstructure:"CampaignId"`
 	User               *User     `gorm:"foreignKey:user_id;references:id"`
 	Campaign           *Campaign `gorm:"foreignKey:campaign_id;references:id"`

@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -16,7 +17,9 @@ func CheckErrorOperation(indicatedError error, ginContext *gin.Context, httpStat
 
 func TransactionOperation(runningTransaction *gorm.DB, ginContext *gin.Context) {
 	occurredError := recover()
+	fmt.Println(occurredError)
 	if occurredError != nil {
+		fmt.Println(occurredError)
 		runningTransaction.Rollback()
 		ginContext.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": runningTransaction.Error.Error()})
 	} else {

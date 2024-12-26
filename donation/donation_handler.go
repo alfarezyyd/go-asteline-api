@@ -1,6 +1,7 @@
 package donation
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-asteline-api/donation/dto"
 	"go-asteline-api/helper"
@@ -11,9 +12,10 @@ type Handler struct {
 	donationService Service
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
-
+func NewHandler(donationService Service) *Handler {
+	return &Handler{
+		donationService: donationService,
+	}
 }
 
 func (donationHandler *Handler) Create(ginContext *gin.Context) {
@@ -22,6 +24,7 @@ func (donationHandler *Handler) Create(ginContext *gin.Context) {
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
+	fmt.Println(ginContext)
 	donationHandler.donationService.HandleCreate(ginContext, &donationCreateDto)
 	ginContext.JSON(http.StatusCreated, gin.H{"status": "created"})
 }
