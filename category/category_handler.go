@@ -32,7 +32,13 @@ func (categoryHandler *Handler) Create(ginContext *gin.Context) {
 }
 
 func (categoryHandler *Handler) Update(ginContext *gin.Context) {
-
+	var categoryUpdateDto dto.CategoryUpdateDto
+	err := ginContext.ShouldBindJSON(&categoryUpdateDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	categoryHandler.categoryService.HandleUpdate(ginContext, &categoryUpdateDto)
+	ginContext.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 func (categoryHandler *Handler) Delete(ginContext *gin.Context) {
 

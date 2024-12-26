@@ -14,3 +14,7 @@ func MapCategoryDtoIntoCategoryModel[T *dto.CategoryCreateDto | *dto.CategoryUpd
 	}
 	return &modelCategory, nil
 }
+
+func MapExistingModelIntoUpdateModel(categoryUpdateDto dto.CategoryUpdateDto, categoryModel model.Category) error {
+	return mapstructure.Decode(categoryModel, &categoryUpdateDto)
+}

@@ -1,6 +1,7 @@
 package category
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go-asteline-api/category/dto"
@@ -58,11 +59,16 @@ func (categoryService *ServiceImpl) HandleUpdate(ginContext *gin.Context, catego
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
+	var existingCategoryModel model.Category
 	gormTransaction := categoryService.dbConnection.Begin()
-	gormTransaction.Where("id = ?", categoryId).First(&categoryModel)
+	gormTransaction.Where("id = ?", categoryId).First(&existingCategoryModel)
+	err = mapper.MapExistingModelIntoUpdateModel(*categoryUpdateDto, *categoryModel)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+	fmt.Println(existingCategoryModel, categoryModel)
 	gormTransaction.Where("id = ?", categoryId).Updates(categoryModel)
 	helper.TransactionOperation(gormTransaction, ginContext)
-	ginContext.JSON(http.StatusOK, categoryModel)
 }
 
 func (categoryService *ServiceImpl) HandleDelete(ginContext *gin.Context) {
