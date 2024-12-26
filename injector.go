@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"go-asteline-api/campaign"
 	"go-asteline-api/category"
+	"go-asteline-api/donation"
 	"go-asteline-api/user"
 	"gorm.io/gorm"
 )
@@ -39,6 +40,15 @@ var categoryFeatureSet = wire.NewSet(
 	wire.Bind(new(category.Controller), new(*category.Handler)),
 )
 
+var donationFeatureSet = wire.NewSet(
+	donation.NewRepository,
+	wire.Bind(new(donation.Repository), new(*donation.RepositoryImpl)),
+	donation.NewService,
+	wire.Bind(new(donation.Service), new(*donation.ServiceImpl)),
+	donation.NewHandler,
+	wire.Bind(new(donation.Controller), new(*donation.Handler)),
+)
+
 func InitializeUserController(gormConnection *gorm.DB, validatorInstance *validator.Validate, viperConfig *viper.Viper) user.Controller {
 	wire.Build(userFeatureSet)
 	return nil
@@ -51,5 +61,10 @@ func InitializeCampaignController(gormConnection *gorm.DB, validatorInstance *va
 
 func InitializeCategoryController(gormConnection *gorm.DB, validatorInstance *validator.Validate) category.Controller {
 	wire.Build(categoryFeatureSet)
+	return nil
+}
+
+func InitializeDonationController(gormConnection *gorm.DB, validatorInstance *validator.Validate) donation.Controller {
+	wire.Build(donationFeatureSet)
 	return nil
 }
