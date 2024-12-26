@@ -83,5 +83,4 @@ func (categoryService *ServiceImpl) HandleDelete(ginContext *gin.Context) {
 		return
 	}
 	helper.TransactionOperation(gormTransaction, ginContext)
-	ginContext.JSON(http.StatusOK, gin.H{"message": "ok"})
 }

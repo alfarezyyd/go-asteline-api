@@ -41,5 +41,6 @@ func (categoryHandler *Handler) Update(ginContext *gin.Context) {
 	ginContext.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 func (categoryHandler *Handler) Delete(ginContext *gin.Context) {
-
+	categoryHandler.categoryService.HandleDelete(ginContext)
+	ginContext.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
