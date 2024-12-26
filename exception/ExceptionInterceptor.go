@@ -1,6 +1,7 @@
 package exception
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -10,7 +11,8 @@ func Interceptor() gin.HandlerFunc {
 		defer func() {
 			if occurredError := recover(); occurredError != nil {
 				// Check if it's our custom
-				if clientError, ok := occurredError.(ClientError); ok {
+				var clientError *ClientError
+				if errors.As(occurredError.(*ClientError), &clientError) {
 					ginContext.AbortWithStatusJSON(clientError.StatusCode, gin.H{
 						"message": clientError.Message,
 					})
@@ -19,7 +21,7 @@ func Interceptor() gin.HandlerFunc {
 
 				// Unknown
 				ginContext.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-					"message": "Internal server occuredErroror",
+					"message": "Internal server occurred",
 				})
 			}
 		}()

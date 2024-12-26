@@ -3,13 +3,14 @@ package helper
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go-asteline-api/exception"
 	"gorm.io/gorm"
 	"net/http"
 )
 
 func CheckErrorOperation(indicatedError error, ginContext *gin.Context, httpStatus int) bool {
 	if indicatedError != nil {
-		ginContext.AbortWithStatusJSON(httpStatus, gin.H{"error": indicatedError.Error()})
+		panic(exception.NewClientError(httpStatus, "Invalid request body"))
 		return true
 	}
 	return false

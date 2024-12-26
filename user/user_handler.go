@@ -20,9 +20,7 @@ func NewHandler(userService Service) *Handler {
 func (userHandler *Handler) Register(ginContext *gin.Context) {
 	var userRegisterDto dto.UserRegisterDto
 	err := ginContext.ShouldBindJSON(&userRegisterDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest)
 	userHandler.UserService.HandleSave(ginContext, &userRegisterDto)
 }
 
