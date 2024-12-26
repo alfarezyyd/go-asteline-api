@@ -42,7 +42,9 @@ func InitializeCategoryController(gormConnection *gorm.DB, validatorInstance *va
 }
 
 func InitializeDonationController(gormConnection *gorm.DB, validatorInstance *validator.Validate, midtransCoreClient *coreapi.Client) donation.Controller {
-	handler := donation.NewHandler()
+	repositoryImpl := donation.NewRepository()
+	serviceImpl := donation.NewService(repositoryImpl, gormConnection, validatorInstance, midtransCoreClient)
+	handler := donation.NewHandler(serviceImpl)
 	return handler
 }
 
