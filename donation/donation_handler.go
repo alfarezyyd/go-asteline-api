@@ -32,5 +32,4 @@ func (donationHandler *Handler) Notification(ginContext *gin.Context) {
 	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
 		return
 	}
-
 }

@@ -13,8 +13,8 @@ type Campaign struct {
 	ImageUrl      string     `gorm:"column:image_url"`
 	status        string     `gorm:"column:status"`
 	UserId        uint64     `gorm:"column:user_id"`
-	User          User       `gorm:"foreignKey:user_id;references:id"`
-	Donation      []Donation `gorm:"foreignKey:donation_id;references:id"`
+	User          *User      `gorm:"foreignKey:user_id;references:id"`
+	Donation      []Donation `gorm:"foreignKey:campaign_id;references:id"`
 	CreatedAt     time.Time  `gorm:"column:created_at;autoCreateTime" mapstructure:"created_at"`
 	UpdatedAt     time.Time  `gorm:"column:updated_at;autoCreateTime;autoUpdateTime" mapstructure:"updated_at"`
 }

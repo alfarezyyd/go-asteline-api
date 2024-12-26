@@ -4,10 +4,10 @@ import "time"
 
 type Donation struct {
 	ID                 string    `gorm:"column:id;primary_key" mapstructure:"Id"`
-	UserId             uint64    `gorm:"column:user_id;foreignKey"`
+	UserId             uint64    `gorm:"column:user_id"`
 	CampaignId         uint64    `gorm:"column:campaign_id" mapstructure:"CampaignId"`
 	User               *User     `gorm:"foreignKey:user_id;references:id"`
-	Campaign           *Campaign `gorm:"foreignKey:campaign_id;references:campaign_id"`
+	Campaign           *Campaign `gorm:"foreignKey:campaign_id;references:id"`
 	TransactionId      string    `gorm:"column:transaction_id"`
 	Name               string    `gorm:"column:name" mapstructure:"Name"`
 	Amount             float64   `gorm:"column:amount" mapstructure:"Amount"`
