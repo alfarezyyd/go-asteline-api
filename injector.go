@@ -6,6 +6,7 @@ package main
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
+	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/spf13/viper"
 	"go-asteline-api/campaign"
 	"go-asteline-api/category"
@@ -64,7 +65,7 @@ func InitializeCategoryController(gormConnection *gorm.DB, validatorInstance *va
 	return nil
 }
 
-func InitializeDonationController(gormConnection *gorm.DB, validatorInstance *validator.Validate) donation.Controller {
+func InitializeDonationController(gormConnection *gorm.DB, validatorInstance *validator.Validate, midtransCoreClient *coreapi.Client) donation.Controller {
 	wire.Build(donationFeatureSet)
 	return nil
 }
