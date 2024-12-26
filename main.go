@@ -38,10 +38,11 @@ func main() {
 	userController := InitializeUserController(databaseConnection, validatorInstance, viperConfig)
 	campaignController := InitializeCampaignController(databaseConnection, validatorInstance)
 	donationController := InitializeDonationController(databaseConnection, validatorInstance, &midtransCoreClient)
+	categoryController := InitializeCategoryController(databaseConnection, validatorInstance)
 	routes.PublicRoute(ginEngine, userController, campaignController, donationController)
 	apiRouterGroup := ginEngine.Group("/api")
 	apiRouterGroup.Use(middleware.AuthMiddleware(viperConfig))
-	routes.UserRoute(apiRouterGroup, campaignController)
+	routes.UserRoute(apiRouterGroup, campaignController, categoryController)
 	err := ginEngine.Run()
 	if err != nil {
 		return

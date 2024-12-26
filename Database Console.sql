@@ -4,4 +4,5 @@ USE go_asteline_api;
 SHOW TABLES;
 SELECT *
 FROM campaigns;
+SELECT * FROM categories;
 SELECT * FROM schema_migrations;
