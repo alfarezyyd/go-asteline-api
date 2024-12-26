@@ -13,6 +13,7 @@ func UserRoute(routerGroup *gin.RouterGroup, campaignController campaign.Control
 	campaignGroup.DELETE("/:id", campaignController.Delete)
 
 	categoryGroup := routerGroup.Group("/categories")
+	categoryGroup.GET("", categoryController.GetAll)
 	categoryGroup.POST("", categoryController.Create)
 	categoryGroup.PUT("/:id", categoryController.Update)
 	categoryGroup.DELETE("/:id", categoryController.Delete)

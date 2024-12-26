@@ -18,7 +18,8 @@ func NewHandler(categoryService Service) *Handler {
 }
 
 func (categoryHandler *Handler) GetAll(ginContext *gin.Context) {
-
+	allCategoryModel := categoryHandler.categoryService.GetAll(ginContext)
+	ginContext.JSON(http.StatusOK, allCategoryModel)
 }
 
 func (categoryHandler *Handler) Create(ginContext *gin.Context) {

@@ -25,7 +25,11 @@ func NewService(categoryRepository Repository, dbConnection *gorm.DB, validatorI
 	}
 }
 
-func (categoryService *ServiceImpl) GetAll(c *gin.Context) {}
+func (categoryService *ServiceImpl) GetAll(ginContext *gin.Context) []model.Category {
+	var allCategoryModel []model.Category
+	categoryService.dbConnection.Find(&allCategoryModel)
+	return allCategoryModel
+}
 
 func (categoryService *ServiceImpl) HandleCreate(ginContext *gin.Context, categoryCreateDto *dto.CategoryCreateDto) {
 	err := categoryService.validatorInstance.Struct(categoryCreateDto)
