@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/midtrans/midtrans-go"
+	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/spf13/viper"
 	"go-asteline-api/config"
 	"go-asteline-api/exception"
@@ -18,22 +20,25 @@ func main() {
 	viperConfig.AddConfigPath(".")
 	viperConfig.AutomaticEnv()
 	viperConfig.ReadInConfig()
+
 	// Initialize
 	ginEngine := gin.Default()
-	// Database
 	databaseInstance := config.NewDatabaseConnection()
 	databaseConnection := databaseInstance.GetDatabaseConnection()
 	validatorInstance := config.InitializeValidator()
-
-	// Routes
-
+	midtrans.ServerKey = viperConfig.GetString("MIDTRANS_SERVER_KEY")
+	midtrans.Environment = midtrans.Sandbox
+	var midtransCoreClient = coreapi.Client{}
+	midtransCoreClient.New(midtrans.ServerKey, midtrans.Sandbox)
 	// Interceptor
 	ginEngine.Use(gin.Recovery())
 	ginEngine.Use(exception.Interceptor())
-	// Injection of User
+
+	// Injection of Dependency
 	userController := InitializeUserController(databaseConnection, validatorInstance, viperConfig)
 	campaignController := InitializeCampaignController(databaseConnection, validatorInstance)
-	routes.PublicRoute(ginEngine, userController, campaignController)
+	donationController := InitializeDonationController(databaseConnection, validatorInstance, midtransCoreClient)
+	routes.PublicRoute(ginEngine, userController, campaignController, donationController)
 	apiRouterGroup := ginEngine.Group("/api")
 	apiRouterGroup.Use(middleware.AuthMiddleware(viperConfig))
 	routes.UserRoute(apiRouterGroup, campaignController)
