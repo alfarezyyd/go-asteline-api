@@ -6,3 +6,4 @@ SELECT *
 FROM campaigns;
 SELECT * FROM categories;
 SELECT * FROM schema_migrations;
+SELECT * FROM donations;

@@ -1,7 +1,7 @@
 CREATE TABLE `donations`
 (
     `id`                   VARCHAR(255)                                        NOT NULL,                           -- ID unik untuk setiap donasi
-    `user_id`              BIGINT UNSIGNED                                     NOT NULL,                           -- Kunci asing menghubungkan pengguna yang mendonasikan
+    `user_id`              BIGINT UNSIGNED,                                                                        -- Kunci asing menghubungkan pengguna yang mendonasikan
     `campaign_id`          BIGINT UNSIGNED                                     NOT NULL,                           -- Kunci asing menghubungkan kampanye yang didonasikan
     `transaction_id`       VARCHAR(255),
     `name`                 VARCHAR(100)                                                 DEFAULT 'Anonymous' NOT NULL,
@@ -13,5 +13,5 @@ CREATE TABLE `donations`
     `updated_at`           TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                                                  -- Tanggal terakhir diperbarui
     PRIMARY KEY (`id`),                                                                                            -- Kunci utama
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),                                                             -- Relasi dengan tabel `user`
-    FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`)                                                       -- Relasi dengan tabel `campaign`
+    FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`)                                                      -- Relasi dengan tabel `campaign`
 );
