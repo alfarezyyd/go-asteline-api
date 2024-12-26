@@ -1,29 +1,28 @@
 package exception
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 func Interceptor() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Next()
+	return func(ginContext *gin.Context) {
+		defer func() {
+			if occurredError := recover(); occurredError != nil {
+				// Check if it's our custom
+				if clientError, ok := occurredError.(ClientError); ok {
+					ginContext.AbortWithStatusJSON(clientError.StatusCode, gin.H{
+						"message": clientError.Message,
+					})
+					return
+				}
 
-		// Tangkap error yang muncul di middleware atau handler
-		err := c.Errors.Last()
-		if err != nil {
-			// Tangani error di sini
-			switch errorType := err.Err.(type) {
-			case *ClientError:
-				c.JSON(errorType.Code, gin.H{
-					"error": errorType.Message,
-				})
-			default:
-				// Tangani error lainnya
-				c.JSON(500, gin.H{
-					"error": err.Error(),
+				// Unknown
+				ginContext.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"message": "Internal server occuredErroror",
 				})
 			}
-
-			// Hentikan eksekusi konteks
-			c.Abort()
-		}
+		}()
+		ginContext.Next()
 	}
 }
