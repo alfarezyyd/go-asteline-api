@@ -13,4 +13,5 @@ func PublicRoute(ginEngine *gin.Engine, userController user.Controller, campaign
 
 	ginEngine.GET("/campaigns", campaignController.GetAll)
 	ginEngine.POST("/donations", donationController.Create)
+	ginEngine.POST("/donations/notifications", donationController.Notification)
 }

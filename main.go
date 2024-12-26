@@ -37,7 +37,7 @@ func main() {
 	// Injection of Dependency
 	userController := InitializeUserController(databaseConnection, validatorInstance, viperConfig)
 	campaignController := InitializeCampaignController(databaseConnection, validatorInstance)
-	donationController := InitializeDonationController(databaseConnection, validatorInstance, midtransCoreClient)
+	donationController := InitializeDonationController(databaseConnection, validatorInstance, &midtransCoreClient)
 	routes.PublicRoute(ginEngine, userController, campaignController, donationController)
 	apiRouterGroup := ginEngine.Group("/api")
 	apiRouterGroup.Use(middleware.AuthMiddleware(viperConfig))

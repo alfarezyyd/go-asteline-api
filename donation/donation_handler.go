@@ -25,3 +25,12 @@ func (donationHandler *Handler) Create(ginContext *gin.Context) {
 	donationHandler.donationService.HandleCreate(ginContext, &donationCreateDto)
 	ginContext.JSON(http.StatusCreated, gin.H{"status": "created"})
 }
+
+func (donationHandler *Handler) Notification(ginContext *gin.Context) {
+	var donationNotificationDto dto.DonationNotificationDto
+	err := ginContext.ShouldBindBodyWithJSON(&donationNotificationDto)
+	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
+		return
+	}
+
+}
