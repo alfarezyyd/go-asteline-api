@@ -13,6 +13,7 @@ type User struct {
 	ProfilePicture string     `gorm:"column:profile_picture" mapstructure:"ProfilePicture"`
 	TotalDonations float64    `gorm:"column:total_donations" mapstructure:"TotalDonations"`
 	Campaign       []Campaign `gorm:"foreignKey:user_id;references:id"`
+	Donation       []Donation `gorm:"foreignKey:user_id;references:id"`
 	CreatedAt      time.Time  `gorm:"column:created_at;autoCreateTime" mapstructure:"created_at"`
 	UpdatedAt      time.Time  `gorm:"column:updated_at;autoCreateTime;autoUpdateTime" mapstructure:"updated_at"`
 }
