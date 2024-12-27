@@ -23,7 +23,7 @@ import (
 func InitializeUserController(gormConnection *gorm.DB, validatorInstance *validator.Validate, viperConfig *viper.Viper) user.Controller {
 	repositoryImpl := user.NewRepository()
 	serviceImpl := user.NewService(repositoryImpl, gormConnection, validatorInstance, viperConfig)
-	handler := user.NewHandler(serviceImpl)
+	handler := user.NewHandler(serviceImpl, viperConfig)
 	return handler
 }
 

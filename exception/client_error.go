@@ -17,3 +17,7 @@ func NewClientError(statusCode int, message string) *ClientError {
 		Message:    message,
 	}
 }
+
+func ThrowClientError(clientError *ClientError) {
+	panic(clientError)
+}

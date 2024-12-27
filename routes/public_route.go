@@ -15,7 +15,7 @@ func PublicRoute(ginEngine *gin.Engine, userController user.Controller, campaign
 	ginEngine.POST("/donations", donationController.Create)
 	ginEngine.POST("/donations/notifications", donationController.Notification)
 
-	ginEngine.GET("/auth/:provider", userController.LoginWithProvider)
-	ginEngine.GET("/auth/:provider/callback", userController.ProviderCallback)
+	ginEngine.GET("/auth/google", userController.LoginWithProvider)
+	ginEngine.GET("/redirect", userController.ProviderCallback)
 	ginEngine.GET("/success", userController.LoginProviderSuccess)
 }

@@ -1,21 +1,26 @@
 package user
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/markbates/goth/gothic"
+	"github.com/spf13/viper"
+	"go-asteline-api/config"
 	"go-asteline-api/exception"
 	"go-asteline-api/helper"
 	"go-asteline-api/user/dto"
+	"io"
 	"net/http"
 )
 
 type Handler struct {
 	UserService Service
+	viperConfig *viper.Viper
 }
 
-func NewHandler(userService Service) *Handler {
+func NewHandler(userService Service, viperConfig *viper.Viper) *Handler {
 	return &Handler{
 		UserService: userService,
+		viperConfig: viperConfig,
 	}
 }
 
@@ -34,22 +39,42 @@ func (userHandler *Handler) Login(ginContext *gin.Context) {
 }
 
 func (userHandler *Handler) LoginWithProvider(ginContext *gin.Context) {
-	provider := ginContext.Param("provider")
-	queryRequest := ginContext.Request.URL.Query()
-	queryRequest.Add("provider", provider)
-	ginContext.Request.URL.RawQuery = queryRequest.Encode()
-	gothic.BeginAuthHandler(ginContext.Writer, ginContext.Request)
+	googleLoginUrl := config.IdentityProviderHolder.GoogleLoginConfig.AuthCodeURL("randomstate")
+	ginContext.Redirect(http.StatusSeeOther, googleLoginUrl)
+	ginContext.JSON(http.StatusOK, googleLoginUrl)
 }
 
 func (userHandler *Handler) ProviderCallback(ginContext *gin.Context) {
-	loginProvider := ginContext.Param("provider")
-	queryRequest := ginContext.Request.URL.Query()
-	queryRequest.Add("provider", loginProvider)
-	ginContext.Request.URL.RawQuery = queryRequest.Encode()
+	state := ginContext.Query("state")
+	if state != "randomstate" {
+		exception.ThrowClientError(&exception.ClientError{
+			StatusCode: http.StatusUnauthorized,
+			Message:    "State does not match",
+		})
+	}
 
-	_, err := gothic.CompleteUserAuth(ginContext.Writer, ginContext.Request)
-	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusInternalServerError, "Internal server error"))
-	ginContext.Redirect(http.StatusTemporaryRedirect, "/success")
+	code := ginContext.Query("code")
+
+	googlecon := config.GoogleConfig(userHandler.viperConfig)
+
+	token, err := googlecon.Exchange(context.Background(), code)
+	helper.CheckErrorOperation(err, &exception.ClientError{
+		StatusCode: http.StatusUnauthorized,
+		Message:    "Token does not match",
+	})
+	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+	helper.CheckErrorOperation(err, &exception.ClientError{
+		StatusCode: http.StatusUnauthorized,
+		Message:    "User data fetch failed",
+	})
+
+	userData, err := io.ReadAll(resp.Body)
+	helper.CheckErrorOperation(err, &exception.ClientError{
+		StatusCode: http.StatusUnauthorized,
+		Message:    "JSON Parsing failed",
+	})
+
+	ginContext.JSON(http.StatusOK, string(userData))
 }
 
 func (userHandler *Handler) LoginProviderSuccess(ginContext *gin.Context) {}

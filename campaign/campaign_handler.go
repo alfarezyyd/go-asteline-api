@@ -25,7 +25,7 @@ func (campaignHandler *Handler) GetAll(ginContext *gin.Context) {
 func (campaignHandler *Handler) Create(ginContext *gin.Context) {
 	var campaignCreateDto dto.CampaignCreateDto
 	err := ginContext.Bind(&campaignCreateDto)
-	helper.CheckErrorOperation(err, http.StatusBadRequest, exception.ErrInvalidRequestBody)
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	imageFile, _ := ginContext.FormFile("imageFile")
 	fmt.Println(campaignCreateDto)
 	campaignCreateDto.ImageFile = imageFile
@@ -36,7 +36,7 @@ func (campaignHandler *Handler) Create(ginContext *gin.Context) {
 func (campaignHandler *Handler) Update(ginContext *gin.Context) {
 	var campaignUpdateDto dto.CampaignUpdateDto
 	err := ginContext.Bind(&campaignUpdateDto)
-	helper.CheckErrorOperation(err, http.StatusBadRequest, exception.ErrInvalidRequestBody)
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	imageFile, _ := ginContext.FormFile("image")
 	campaignHandler.CampaignService.HandleUpdate(ginContext, &campaignUpdateDto, imageFile)
 }
