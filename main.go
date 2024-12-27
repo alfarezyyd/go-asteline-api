@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/providers/google"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"github.com/spf13/viper"
@@ -20,6 +22,14 @@ func main() {
 	viperConfig.AddConfigPath(".")
 	viperConfig.AutomaticEnv()
 	viperConfig.ReadInConfig()
+
+	// Load Google OAUTH2 Credentials
+	googleClientId := viperConfig.GetString("GOOGLE_CLIENT_ID")
+	googleClientSecret := viperConfig.GetString("GOOGLE_CLIENT_SECRET")
+	googleClientCallbackUrl := viperConfig.GetString("GOOGLE_CLIENT_CALLBACK_URL")
+	goth.UseProviders(
+		google.New(googleClientId, googleClientSecret, googleClientCallbackUrl),
+	)
 
 	// Initialize
 	ginEngine := gin.Default()
