@@ -6,6 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
+	"go-asteline-api/exception"
 	"go-asteline-api/helper"
 	"go-asteline-api/mapper"
 	"go-asteline-api/model"
@@ -34,14 +35,10 @@ func NewService(userRepository Repository, dbConnection *gorm.DB, structValidato
 
 func (userService *ServiceImpl) HandleSave(ginContext *gin.Context, userRegisterDto *dto.UserRegisterDto) bool {
 	err := userService.structValidator.Struct(userRegisterDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return false
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	dbTransaction := userService.dbConnection.Begin()
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userRegisterDto.Password), 14)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return false
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	userRegisterDto.Password = string(hashedPassword)
 	userModel, _ := mapper.MapUserRegisterDtoIntoUserModel(*userRegisterDto)
 	defer dbTransaction.Rollback()
@@ -52,28 +49,20 @@ func (userService *ServiceImpl) HandleSave(ginContext *gin.Context, userRegister
 
 func (userService *ServiceImpl) HandleLogin(ginContext *gin.Context, userLoginDto *dto.UserLoginDto) bool {
 	err := userService.structValidator.Struct(userLoginDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return false
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	dbTransaction := userService.dbConnection.Begin()
 	var searchedUsers model.User
-	searchResult := dbTransaction.Where("email = ?", userLoginDto.Email).First(&searchedUsers)
-	if helper.CheckErrorOperation(searchResult.Error, ginContext, http.StatusBadRequest) {
-		return false
-	}
+	searchResult := dbTransaction.Where("email = ?", userLoginDto.Email).First(&searchedUsers).Error
+	helper.CheckErrorOperation(err, exception.ParseGormError(searchResult))
 	err = bcrypt.CompareHashAndPassword([]byte(searchedUsers.Password), []byte(userLoginDto.Password))
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return false
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrUnauthorized))
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": userLoginDto.Email,
 		"exp":   time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	})
 	fmt.Println(jwtToken, userService.viperConfig.GetString("JWT_SECRET"))
 	tokenString, err := jwtToken.SignedString([]byte(userService.viperConfig.GetString("JWT_SECRET")))
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return false
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrUnauthorized))
 	fmt.Println(tokenString)
 	ginContext.JSON(200, gin.H{
 		"token": tokenString,

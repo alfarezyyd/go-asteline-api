@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go-asteline-api/category/dto"
+	"go-asteline-api/exception"
 	"go-asteline-api/helper"
 	"go-asteline-api/mapper"
 	"go-asteline-api/model"
@@ -34,13 +35,9 @@ func (categoryService *ServiceImpl) GetAll(ginContext *gin.Context) []model.Cate
 
 func (categoryService *ServiceImpl) HandleCreate(ginContext *gin.Context, categoryCreateDto *dto.CategoryCreateDto) {
 	err := categoryService.validatorInstance.Struct(categoryCreateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	categoryModel, err := mapper.MapCategoryDtoIntoCategoryModel(categoryCreateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	categoryService.dbConnection.Create(categoryModel)
 	ginContext.JSON(http.StatusCreated, categoryModel)
 }
@@ -52,20 +49,15 @@ func (categoryService *ServiceImpl) HandleUpdate(ginContext *gin.Context, catego
 		return
 	}
 	err := categoryService.validatorInstance.Struct(categoryUpdateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	categoryModel, err := mapper.MapCategoryDtoIntoCategoryModel(categoryUpdateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	var existingCategoryModel model.Category
 	gormTransaction := categoryService.dbConnection.Begin()
 	gormTransaction.Where("id = ?", categoryId).First(&existingCategoryModel)
 	err = mapper.MapExistingModelIntoUpdateModel(*categoryUpdateDto, *categoryModel)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
+
 	fmt.Println(existingCategoryModel, categoryModel)
 	gormTransaction.Where("id = ?", categoryId).Updates(categoryModel)
 	helper.TransactionOperation(gormTransaction, ginContext)
@@ -78,9 +70,7 @@ func (categoryService *ServiceImpl) HandleDelete(ginContext *gin.Context) {
 		return
 	}
 	gormTransaction := categoryService.dbConnection.Begin()
-	dbConn := gormTransaction.Where("id = ?", categoryId).Delete(&model.Category{})
-	if helper.CheckErrorOperation(dbConn.Error, ginContext, http.StatusBadRequest) {
-		return
-	}
+	err := gormTransaction.Where("id = ?", categoryId).Delete(&model.Category{}).Error
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	helper.TransactionOperation(gormTransaction, ginContext)
 }

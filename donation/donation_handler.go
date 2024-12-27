@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-asteline-api/donation/dto"
+	"go-asteline-api/exception"
 	"go-asteline-api/helper"
 	"net/http"
 )
@@ -21,9 +22,7 @@ func NewHandler(donationService Service) *Handler {
 func (donationHandler *Handler) Create(ginContext *gin.Context) {
 	var donationCreateDto dto.DonationCreateDto
 	err := ginContext.ShouldBindBodyWithJSON(&donationCreateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	fmt.Println(ginContext)
 	donationHandler.donationService.HandleCreate(ginContext, &donationCreateDto)
 	ginContext.JSON(http.StatusCreated, gin.H{"status": "created"})
@@ -32,7 +31,5 @@ func (donationHandler *Handler) Create(ginContext *gin.Context) {
 func (donationHandler *Handler) Notification(ginContext *gin.Context) {
 	var donationNotificationDto dto.DonationNotificationDto
 	err := ginContext.ShouldBindBodyWithJSON(&donationNotificationDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 }

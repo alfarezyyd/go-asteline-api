@@ -8,6 +8,7 @@ import (
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"go-asteline-api/donation/dto"
+	"go-asteline-api/exception"
 	"go-asteline-api/helper"
 	"go-asteline-api/mapper"
 	"go-asteline-api/model"
@@ -34,9 +35,7 @@ func NewService(donationRepository Repository, dbConnection *gorm.DB, validation
 
 func (donationHandler *ServiceImpl) HandleCreate(ginContext *gin.Context, donationCreateDto *dto.DonationCreateDto) {
 	err := donationHandler.validationInstance.Struct(donationCreateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	//userClaims, isExists := ginContext.Get("claims")
 	//if !isExists {
 	//	ginContext.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -53,9 +52,8 @@ func (donationHandler *ServiceImpl) HandleCreate(ginContext *gin.Context, donati
 	gormTransaction.Where("id = ?", donationCreateDto.CampaignId).First(&campaignModel)
 	generatedUUID := uuid.New().String()
 	donationModel, err := mapper.MapDonationDtoIntoDonationModel(donationCreateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
+
 	donationModel.PaymentStatus = "Pending"
 	donationModel.ID = generatedUUID
 	gormTransaction.Create(&donationModel)
@@ -78,13 +76,12 @@ func (donationHandler *ServiceImpl) HandleCreate(ginContext *gin.Context, donati
 			LName: "",
 		},
 	})
-	if midtransError != nil && helper.CheckErrorOperation(midtransError.GetRawError(), ginContext, http.StatusBadRequest) {
+	if midtransError != nil && helper.CheckErrorOperation(midtransError.GetRawError(), exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody)) {
 		return
 	}
 	mapper.MapMidtransResponseIntoDonationModel(donationModel, chargeResponse)
 	fmt.Println(donationModel)
 	err = gormTransaction.Where("id = ?", generatedUUID).Updates(donationModel).Error
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
+
 }

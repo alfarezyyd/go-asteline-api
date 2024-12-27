@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-asteline-api/campaign/dto"
+	"go-asteline-api/exception"
 	"go-asteline-api/helper"
 	"net/http"
 )
@@ -24,11 +25,9 @@ func (campaignHandler *Handler) GetAll(ginContext *gin.Context) {
 func (campaignHandler *Handler) Create(ginContext *gin.Context) {
 	var campaignCreateDto dto.CampaignCreateDto
 	err := ginContext.Bind(&campaignCreateDto)
+	helper.CheckErrorOperation(err, http.StatusBadRequest, exception.ErrInvalidRequestBody)
 	imageFile, _ := ginContext.FormFile("imageFile")
 	fmt.Println(campaignCreateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
 	campaignCreateDto.ImageFile = imageFile
 
 	campaignHandler.CampaignService.HandleCreate(ginContext, &campaignCreateDto, imageFile)
@@ -37,10 +36,8 @@ func (campaignHandler *Handler) Create(ginContext *gin.Context) {
 func (campaignHandler *Handler) Update(ginContext *gin.Context) {
 	var campaignUpdateDto dto.CampaignUpdateDto
 	err := ginContext.Bind(&campaignUpdateDto)
+	helper.CheckErrorOperation(err, http.StatusBadRequest, exception.ErrInvalidRequestBody)
 	imageFile, _ := ginContext.FormFile("image")
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
 	campaignHandler.CampaignService.HandleUpdate(ginContext, &campaignUpdateDto, imageFile)
 }
 

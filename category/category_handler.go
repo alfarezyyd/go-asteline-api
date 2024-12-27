@@ -3,6 +3,7 @@ package category
 import (
 	"github.com/gin-gonic/gin"
 	"go-asteline-api/category/dto"
+	"go-asteline-api/exception"
 	"go-asteline-api/helper"
 	"net/http"
 )
@@ -25,18 +26,14 @@ func (categoryHandler *Handler) GetAll(ginContext *gin.Context) {
 func (categoryHandler *Handler) Create(ginContext *gin.Context) {
 	var categoryCreateDto dto.CategoryCreateDto
 	err := ginContext.ShouldBindJSON(&categoryCreateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	categoryHandler.categoryService.HandleCreate(ginContext, &categoryCreateDto)
 }
 
 func (categoryHandler *Handler) Update(ginContext *gin.Context) {
 	var categoryUpdateDto dto.CategoryUpdateDto
 	err := ginContext.ShouldBindJSON(&categoryUpdateDto)
-	if helper.CheckErrorOperation(err, ginContext, http.StatusBadRequest) {
-		return
-	}
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrInvalidRequestBody))
 	categoryHandler.categoryService.HandleUpdate(ginContext, &categoryUpdateDto)
 	ginContext.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

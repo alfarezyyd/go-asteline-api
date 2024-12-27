@@ -8,9 +8,9 @@ import (
 	"net/http"
 )
 
-func CheckErrorOperation(indicatedError error, ginContext *gin.Context, httpStatus int) bool {
+func CheckErrorOperation(indicatedError error, clientError *exception.ClientError) bool {
 	if indicatedError != nil {
-		panic(exception.NewClientError(httpStatus, "Invalid request body"))
+		panic(clientError)
 		return true
 	}
 	return false
